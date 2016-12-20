@@ -1,5 +1,5 @@
 from flask import request, send_from_directory
-from flask_restful import fields, Resource
+from flask_restful import abort, fields, Resource
 
 from wts_api.common import SessionScope
 from wts_api.common.utils import my_marshal, valid_task, valid_uuid
@@ -30,12 +30,16 @@ task_fields = {
 }
 
 
+def abort_on_invalid_uuid(uuid):
+    if uuid is None:
+        abort(400, message="No UUID provided")
+    if not valid_uuid(uuid):
+        abort(400, message="'{}' is not a valid UUID".format(uuid))
+
+
 class Task(Resource):
     def delete(self, uuid=None):
-        if uuid is None:
-            return {'error': 'No UUID provided'}, 400
-        if not valid_uuid(uuid):
-            return {'error': "'{}' is not a valid UUID".format(uuid)}, 400
+        abort_on_invalid_uuid(uuid)
 
         with SessionScope() as session:
             task = session.query(models.Task).filter(models.Task.uuid == uuid).first()
@@ -47,10 +51,7 @@ class Task(Resource):
 
 
     def get(self, uuid=None):
-        if uuid is None:
-            return {'error': 'No UUID provided'}, 400
-        if not valid_uuid(uuid):
-            return {'error': "'{}' is not a valid UUID".format(uuid)}, 400
+        abort_on_invalid_uuid(uuid)
 
         with SessionScope() as session:
             task = session.query(models.Task).filter(models.Task.uuid == uuid).first()
@@ -82,10 +83,7 @@ class TaskList(Resource):
 
 class Video(Resource):
     def get(self, uuid=None):
-        if uuid is None:
-            return {'error': 'No UUID provided'}, 400
-        if not valid_uuid(uuid):
-            return {'error': "'{}' is not a valid UUID".format(uuid)}, 400
+        abort_on_invalid_uuid(uuid)
 
         with SessionScope() as session:
             t = session.query(models.Task).filter(models.Task.uuid == uuid).first()
