@@ -1,16 +1,32 @@
 from flask import request
-from flask_restful import fields, marshal, Resource
+from flask_restful import fields, Resource
 
 from wts_api.common import SessionScope
-from wts_api.common.utils import valid_task, valid_uuid
+from wts_api.common.utils import my_marshal, valid_task, valid_uuid
 from wts_db import models
 from wts_worker import worker
+
+
+class TaskStatusField(fields.Raw):
+    status = {
+        0: 'pending',
+        1: 'started',
+        2: 'finished',
+        3: 'error'
+    }
+
+    def format(self, value):
+        return self.status[value]
 
 
 task_fields = {
     'uuid': fields.String,
     'sub_date': fields.DateTime,
-    'src_url': fields.String
+    'upd_date': fields.DateTime,
+    'src_url': fields.String,
+    # 'dst_url': fields.String,
+    'dst_url': fields.Url('video', absolute=True),
+    'status': TaskStatusField,
 }
 
 
@@ -27,7 +43,7 @@ class Task(Resource):
                 return {'error': "'{}' unknown task".format(uuid)}, 404
             session.delete(task)
             session.commit()
-            return marshal(task, task_fields)
+            return my_marshal(task, task_fields)
 
 
     def get(self, uuid=None):
@@ -40,7 +56,7 @@ class Task(Resource):
             task = session.query(models.Task).filter(models.Task.uuid == uuid).first()
             if task is None:
                 return {'error': "'{}' unknown task".format(uuid)}, 404
-            return marshal(task, task_fields)
+            return my_marshal(task, task_fields)
 
 
     def post(self):
@@ -52,12 +68,13 @@ class Task(Resource):
             task = models.Task(data['url'])
             session.add(task)
             session.commit()
-            worker.video_download.delay(task.uuid)
-            return marshal(task, task_fields, envelope='task')
+            chain = worker.video_download.s(task.uuid) | worker.video_move.s(task.uuid)
+            chain()
+            return my_marshal(task, task_fields, envelope='task')
 
 
 class TaskList(Resource):
     def get(self):
         with SessionScope() as session:
             tasks = session.query(models.Task).all()
-            return marshal(tasks, task_fields, envelope='tasks')
+            return my_marshal(tasks, task_fields, envelope='tasks')
