@@ -75,3 +75,12 @@ Things to do in no particular order:
       [marshal](http://flask-restful-cn.readthedocs.io/en/0.3.4/fields.html)
 	- Packaging with `setuptools` (look at `console_scripts`)
 	- Everything must work inside a virtualenv
+
+
+## Step 2
+
+Add database versionning with
+[http://alembic.zzzcomputing.com/en/latest/](Alembic).
+
+Given an empty database, doing an `alembic upgrade head` must create all the
+database tables.
