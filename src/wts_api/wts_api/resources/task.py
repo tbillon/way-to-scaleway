@@ -1,10 +1,10 @@
 from flask import request, send_from_directory
 from flask_restful import abort, fields, Resource
 
-from wts_api.common import SessionScope
-from wts_api.common.utils import my_marshal, valid_task, valid_uuid
-from wts_db import models, config
-from wts_worker import worker
+from wts_api.wts_api.common import SessionScope
+from wts_api.wts_api.common.utils import my_marshal, valid_task, valid_uuid
+from wts_db.wts_db import models, config
+from wts_worker.wts_worker import worker
 
 
 class TaskStatusField(fields.Raw):

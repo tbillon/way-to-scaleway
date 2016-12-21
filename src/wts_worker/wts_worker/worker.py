@@ -5,8 +5,8 @@ from time import sleep
 from celery import Celery
 import youtube_dl
 
-from wts_db import models, config
-from wts_worker import DatabaseTask
+from wts_db.wts_db import models, config
+from wts_worker.wts_worker import DatabaseTask
 
 
 app = Celery('tasks', backend='rpc://', broker='amqp://localhost')
