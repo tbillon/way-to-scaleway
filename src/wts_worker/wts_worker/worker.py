@@ -45,7 +45,7 @@ def video_download(self, uuid):
             else:
                 # Just a video
                 video = res
-                return ydl_opts['outtmpl'] % video
+                return {'file': ydl_opts['outtmpl'] % video, 'title': res['title']}
         except youtube_dl.DownloadError as e:
             t.status = 3
             self.session.commit()
@@ -53,11 +53,13 @@ def video_download(self, uuid):
 
 
 @app.task(base=DatabaseTask, bind=True, ignore_result=True)
-def video_move(self, file_name, uuid):
+def video_move(self, properties, uuid):
     if not os.path.isdir(config.INCOMING_VIDEO_URI):
         os.makedirs(config.INCOMING_VIDEO_URI)
-    os.rename(file_name, os.path.join(config.INCOMING_VIDEO_URI, file_name))
+    os.rename(properties['file'], os.path.join(config.INCOMING_VIDEO_URI, properties['file']))
     t = self.session.query(models.Task).filter(models.Task.uuid == uuid).one()
-    t.dst_url = file_name
+    t.dst_url = properties['file']
+    if properties['title'] is not None:
+        t.title = properties['title']
     t.status = 2
     self.session.commit()

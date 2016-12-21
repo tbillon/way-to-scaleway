@@ -84,3 +84,9 @@ Add database versionning with
 
 Given an empty database, doing an `alembic upgrade head` must create all the
 database tables.
+
+
+## Step 3
+
+Add a title field to the database to store the video title. Update the
+database schema with an alembic migration.

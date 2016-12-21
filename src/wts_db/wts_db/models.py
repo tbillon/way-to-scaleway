@@ -18,6 +18,7 @@ class Task(Base):
     status = Column(Integer, default=0, server_default='0')
     dst_url = Column(String(2083), nullable=True)
     src_url = Column(String(2083), nullable=False)
+    title = Column(String(100), nullable=True)
 
     def __init__(self, url):
         self.src_url = url
