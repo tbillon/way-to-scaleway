@@ -1,8 +1,8 @@
-"""Add video title column
+"""Add a title field
 
-Revision ID: 7631bc795be3
-Revises: fbc89a453a28
-Create Date: 2016-12-20 23:05:49.854726
+Revision ID: 88a8cb25cf37
+Revises: fb02a2f6bee9
+Create Date: 2016-12-27 16:50:21.172984
 
 """
 from alembic import op
@@ -10,8 +10,8 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '7631bc795be3'
-down_revision = 'fbc89a453a28'
+revision = '88a8cb25cf37'
+down_revision = 'fb02a2f6bee9'
 branch_labels = None
 depends_on = None
 

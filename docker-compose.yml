@@ -1,0 +1,26 @@
+version: '2'
+
+volumes:
+  wts_database:
+    driver: local
+
+
+services:
+  wts-postgres:
+    image: postgres:9.6
+    container_name: wts-postgres
+    volumes:
+      - wts_database:/var/lib/postgresql/data
+      - ./database/schema.sql:/docker-entrypoint-initdb.d/schema.sql:ro
+    ports:
+      - '5432:5432'
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: user
+
+  wts-rabbit:
+    image: rabbitmq:3.6
+    container_name: wts-rabbit
+    ports:
+      - '5672:5672'
