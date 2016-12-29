@@ -15,6 +15,7 @@ class SessionScope(object):
     """Create database session when needed
     """
     _session = None
+    _keep = False
 
     def __enter__(self):
         if self._session is None:
@@ -22,7 +23,7 @@ class SessionScope(object):
         return self._session
 
     def __exit__(self, type, value, traceback):
-        if self._session is not None:
+        if (self._session is not None) and (not self._keep):
             self._session.close()
 
     @classmethod
@@ -34,3 +35,13 @@ class SessionScope(object):
         cls.Engine = create_engine(conn, echo=Settings.get('DEBUG'))
         cls.Session = sessionmaker(bind=cls.Engine)
         return cls
+
+    @classmethod
+    def init_session(cls, keep=False):
+        """
+        Create database session
+        """
+        cls._keep = keep
+        if cls._session is None:
+            cls._session = cls.Session()
+        return cls._session
