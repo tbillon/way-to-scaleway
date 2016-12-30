@@ -37,7 +37,7 @@ def video_download(self, uuid):
 
     ydl_opts = {
         'format': 'best',
-        'outtmpl': '%(id)s.%(ext)s',
+        'outtmpl': '{}%(id)s.%(ext)s'.format(Settings.get('OUTPUT_DIRECTORY')),
         'quiet': not Settings.get('DEBUG'),
         'logger': MyLogger(),
     }
@@ -56,11 +56,7 @@ def video_download(self, uuid):
 
 
 @app.task(base=DatabaseTask, bind=True, ignore_result=True)
-def video_move(self, video, uuid):
-    if not os.path.isdir(Settings.get('OUTPUT_DIRECTORY')):
-        os.makedirs(Settings.get('OUTPUT_DIRECTORY'))
-    os.rename(video.get('file'), os.path.join(Settings.get('OUTPUT_DIRECTORY'), video.get('file')))
-
+def video_register_title(self, video, uuid):
     task = self.session.query(models.Task).filter(models.Task.uuid == uuid).one()
     task.dst_url = video.get('file')
     if video.get('title') is not None:

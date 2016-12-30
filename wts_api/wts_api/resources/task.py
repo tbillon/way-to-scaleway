@@ -61,7 +61,7 @@ class Task(Resource):
             task = models.Task(data['url'])
             ssc.add(task)
             ssc.commit()
-            chain = worker.video_download.s(task.uuid) | worker.video_move.s(task.uuid)
+            chain = worker.video_download.s(task.uuid) | worker.video_register_title.s(task.uuid)
             chain()
             return marshal(task, self.task_post_fields, envelope='task')
 
