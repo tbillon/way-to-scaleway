@@ -10,4 +10,4 @@ setup(name='wts_api',
       install_requires=['SQLAlchemy', 'psycopg2', 'PyYAML'],
       entry_points={
           'console_scripts': ['start-wts-api=wts_api.command_line:main'],
-})
+      })

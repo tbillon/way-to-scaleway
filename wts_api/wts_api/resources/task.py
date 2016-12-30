@@ -41,7 +41,6 @@ class Task(Resource):
             ssc.commit()
             return marshal(task, self.task_delete_fields)
 
-
     def get(self, uuid=None):
         abort_on_invalid_uuid(uuid)
 
@@ -50,7 +49,6 @@ class Task(Resource):
             if task is None:
                 return {'error': "'{}' unknown task".format(uuid)}, 404
             return marshal(task, self.task_get_fields)
-
 
     def post(self):
         data = request.get_json(force=True)

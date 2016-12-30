@@ -9,9 +9,9 @@ import os
 
 import youtube_dl
 
-from wts_worker.app import app
 from wts_db import models
 from wts_worker import DatabaseTask
+from wts_worker.app import app
 from wts_worker.settings import Settings
 
 
@@ -33,7 +33,9 @@ class MyLogger(object):
 
 @app.task(base=DatabaseTask, bind=True, ignore_result=False)
 def video_download(self, uuid):
-    t = self.session.query(models.Task).filter(models.Task.uuid == uuid).one()
+    """Download a video from Youtube
+    """
+    task = self.session.query(models.Task).filter(models.Task.uuid == uuid).one()
 
     ydl_opts = {
         'format': 'best',
@@ -43,7 +45,7 @@ def video_download(self, uuid):
     }
     with youtube_dl.YoutubeDL(ydl_opts) as ydl:
         try:
-            res = ydl.extract_info(t.src_url,force_generic_extractor=True )
+            res = ydl.extract_info(task.src_url, force_generic_extractor=True)
             if 'entries' in res:
                 # Can be a playlist or a list of videos
                 video = res['entries'][0]
@@ -51,12 +53,14 @@ def video_download(self, uuid):
                 # Just a video
                 video = res
             return {'file': ydl_opts['outtmpl'] % video, 'title': res['title']}
-        except youtube_dl.DownloadError as e:
-            raise e
+        except youtube_dl.DownloadError as exc:
+            raise exc
 
 
 @app.task(base=DatabaseTask, bind=True, ignore_result=True)
 def video_register_title(self, video, uuid):
+    """Set the video title
+    """
     task = self.session.query(models.Task).filter(models.Task.uuid == uuid).one()
     task.dst_url = video.get('file')
     if video.get('title') is not None:

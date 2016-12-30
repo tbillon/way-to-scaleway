@@ -10,4 +10,4 @@ setup(name='wts_worker',
       install_requires=['SQLAlchemy', 'psycopg2', 'PyYAML', 'celery'],
       entry_points={
           'console_scripts': ['start-wts-worker=wts_worker.app:main'],
-})
+      })

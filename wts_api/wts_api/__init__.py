@@ -6,7 +6,7 @@ from wts_api.resources import task
 from wts_api.settings import Settings
 
 
-def start_api(conf=None):
+def start_api():
     """Creates the Flask application and registers its resources
     """
     app = Flask(__name__)

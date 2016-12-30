@@ -25,6 +25,7 @@ def initialize_api():
 
     session.rollback()
 
+
 @pytest.fixture(scope='module')
 def create_dataset(initialize_api, scope='module'):
     """Create a dataset to work on
@@ -35,6 +36,7 @@ def create_dataset(initialize_api, scope='module'):
         task = models.Task('http://example.com/{}'.format(i))
         session.add(task)
 
+
 def test_inserted_data(initialize_api, create_dataset):
     """Test that inserted task are correct
     """
@@ -44,6 +46,7 @@ def test_inserted_data(initialize_api, create_dataset):
         res = client.get('/task/{}'.format(task.uuid))
         assert res.status_code == 200
         assert res.get_data() == '{{"uuid": "{}"}}\n'.format(task.uuid)
+
 
 def test_invalid_data(initialize_api):
     """Test that an unknown UUID return a 404 error
