@@ -20,7 +20,7 @@ def main():
         sys.exit(1)
     Settings.load_from_file(credentials)
     app = wts_api.start_api()
-    app.run()
+    app.run(host='0.0.0.0', port='5000')
 
 
 if __name__ == '__main__':
