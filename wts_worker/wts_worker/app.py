@@ -22,21 +22,19 @@ app = Celery('wts_worker',
              include=['wts_worker.worker'])
 
 
-credentials = os.environ.get('CREDENTIALS')
-if credentials is None:
-    print 'Could not load credentials file'
-    sys.exit(1)
-Settings.load_from_file(credentials)
-
-app.conf.update(
-    broker_url=broker_url(Settings),
-)
-wts_worker.DatabaseTask.init_database()
-
-
 def main():
     """Program entry point
     """
+    credentials = os.environ.get('CREDENTIALS')
+    if credentials is None:
+        print 'Could not load credentials file'
+        sys.exit(1)
+    Settings.load_from_file(credentials)
+
+    app.conf.update(
+        broker_url=broker_url(Settings),
+    )
+    wts_worker.DatabaseTask.init_database()
     app.start()
 
 
