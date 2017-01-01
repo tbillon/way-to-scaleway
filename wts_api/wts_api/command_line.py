@@ -8,6 +8,7 @@ import os
 import sys
 
 import wts_api
+from wts_api.worker import worker, broker_url
 from wts_api.settings import Settings
 
 
@@ -20,6 +21,8 @@ def main():
         sys.exit(1)
     Settings.load_from_file(credentials)
     app = wts_api.start_api()
+
+    worker.conf.update(broker_url=broker_url(Settings))
     app.run(host='0.0.0.0', port='5000')
 
 

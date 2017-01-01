@@ -12,8 +12,8 @@ from sqlalchemy import and_
 from wts_api.settings import Settings
 from wts_api.session import SessionScope
 from wts_api.utils import valid_task, valid_uuid
+from wts_api.worker import video_download_chain_task
 from wts_db import models
-from wts_worker import worker
 
 
 def abort_on_invalid_uuid(uuid):
@@ -59,8 +59,7 @@ class Task(Resource):
             task = models.Task(data['url'])
             ssc.add(task)
             ssc.commit()
-            chain = worker.video_download.s(task.uuid) | worker.video_register_title.s(task.uuid)
-            chain()
+            video_download_chain_task(task.uuid)
             return marshal(task, self.task_post_fields, envelope='task')
 
 

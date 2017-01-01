@@ -10,9 +10,9 @@ RUN apt-get install -y \
     libpq-dev \
     libpq5 \
     && pip install -r wts_db/requirements.txt \
-    && pip install -r wts_worker/requirements.txt
+    && pip install wts_db/
 
-RUN pip install wts_db/ \
+RUN pip install -r wts_worker/requirements.txt \
     && pip install wts_worker/
 
 CMD ["start-wts-worker", "worker", "-A", "wts_worker.app"]
