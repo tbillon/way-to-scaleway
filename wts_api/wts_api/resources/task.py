@@ -4,13 +4,13 @@ SW tutorial
 
 Task REST functions
 """
+from elasticsearch_dsl.connections import connections
 from flask import request, send_from_directory
 from flask_restful import abort, fields, marshal, Resource
-
 from sqlalchemy import and_
 
-from wts_api.settings import Settings
 from wts_api.session import SessionScope
+from wts_api.settings import Settings
 from wts_api.utils import valid_task, valid_uuid
 from wts_api.worker import video_download_chain_task
 from wts_db import models
@@ -38,6 +38,10 @@ class Task(Resource):
             if task is None:
                 return {'error': "'{}' unknown task".format(uuid)}, 404
             ssc.delete(task)
+            es = connections.get_connection()
+            es.delete(index=Settings.get('SEARCH_INDEX'),
+                      doc_type=Settings.get('SEARCH_DOC'),
+                      id='{}'.format(uuid))
             ssc.commit()
             return marshal(task, self.task_delete_fields)
 

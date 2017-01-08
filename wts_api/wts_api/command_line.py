@@ -23,7 +23,7 @@ def main():
     app = wts_api.start_api()
 
     worker.conf.update(broker_url=broker_url(Settings))
-    app.run(host='0.0.0.0', port='5000')
+    app.run(host='0.0.0.0', port=5000)
 
 
 if __name__ == '__main__':

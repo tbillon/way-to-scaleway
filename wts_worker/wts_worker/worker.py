@@ -11,7 +11,7 @@ import youtube_dl
 
 from wts_db import models
 from wts_worker import DatabaseTask
-from wts_worker.app import app
+from wts_worker.app import app, es
 from wts_worker.settings import Settings
 
 
@@ -62,7 +62,14 @@ def video_register_title(self, video, uuid):
     """Set the video title
     """
     task = self.session.query(models.Task).filter(models.Task.uuid == uuid).one()
-    task.dst_url = video.get('file')
+    task.dst_url = os.path.basename(video.get('file'))
     if video.get('title') is not None:
         task.title = video.get('title')
+        es.index(index='wts',
+                 doc_type='video',
+                 id=uuid,
+                 body={
+                     'file': task.dst_url,
+                     'title': video.get('title')
+                 })
     self.session.commit()

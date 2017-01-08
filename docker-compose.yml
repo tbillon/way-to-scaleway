@@ -1,7 +1,11 @@
 version: '2'
 
+
 volumes:
   wts_database:
+    driver: local
+
+  wts_index:
     driver: local
 
   wts_videos:
@@ -39,6 +43,12 @@ services:
     links:
       - wts-api
 
+  wts-search:
+    image: elasticsearch:5.1
+    container_name: wts-search
+    volumes:
+      - wts_index:/usr/share/elasticsearch/data
+
   wts-worker:
     container_name: wts-worker
     build:
@@ -51,6 +61,7 @@ services:
     links:
       - wts-postgres
       - wts-rabbit
+      - wts-search
 
   wts-api:
     container_name: wts-api
@@ -65,3 +76,4 @@ services:
       - wts-postgres
       - wts-rabbit
       - wts-worker
+      - wts-search
